@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت لیست آی‌پی</title>
+    
+    <link rel="stylesheet" href="https://lib.arvancloud.ir/vazir-font/33.003/UI/Vazirmatn-UI-font-face.css">
+    <link href="https://lib.arvancloud.ir/bootstrap/5.3.0-alpha1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://lib.arvancloud.ir/bootstrap-icons/1.9.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, rgba(13, 110, 253, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background-color: var(--bs-body-bg);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Vazirmatn UI', sans-serif !important;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        button, input, textarea, .card, .alert {
+            font-family: 'Vazirmatn UI', sans-serif !important;
+        }
+        
+        textarea{direction: ltr}
+        .container { max-width: 600px; margin: 40px auto; }
+        
+        .card {
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bs-body-bg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--bs-primary) 0%, #6366f1 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+     
+        
+        [data-bs-theme='dark'] .card {
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(30, 30, 40, 0.95);
+        }
+        
+        [data-bs-theme='dark'] .card::before {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+
+        /* Segmented Control */
+        .file-nav {
+            background: var(--bs-tertiary-bg);
+            padding: 8px;
+            border-radius: 16px;
+            display: flex;
+            gap: 6px;
+            margin-bottom: 32px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+            border: 1px solid var(--bs-border-color);
+        }
+
+        [data-bs-theme='dark'] .file-nav {
+            background: rgba(0,0,0,0.35);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .file-nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--bs-secondary);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-bs-theme='dark'] .file-nav-item {
+            color: var(--bs-secondary-color);
+        }
+
+        .file-nav-item i {
+            font-size: 1.4rem;
+            transition: transform 0.3s ease;
+        }
+
+        .file-nav-item:hover i {
+            transform: scale(1.15) translateY(-2px);
+        }
+
+        [data-bs-theme='dark'] .file-nav-item.active {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.95) 0%, rgba(37, 99, 235, 0.95) 100%);
+            color: white !important;
+            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.6), inset 0 1px 0 rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .file-nav-item.active {
+            background: var(--bs-primary);
+            color: white !important;
+            box-shadow: 0 3px 12px rgba(var(--bs-primary-rgb), 0.5);
+        }
+
+        #theme-toggle {
+            background: var(--bs-tertiary-bg);
+            border: 2px solid var(--bs-border-color);
+            font-size: 1.4rem;
+            color: var(--bs-secondary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #theme-toggle::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: var(--bs-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        
+        #theme-toggle:hover {
+            background-color: var(--bs-primary);
+            color: white;
+            transform: scale(1.1) rotate(15deg);
+            border-color: var(--bs-primary);
+        }
+        
+        #theme-toggle:hover::before {
+            opacity: 0.15;
+        }
+        
+        #theme-toggle:active { transform: scale(1.05); }
+
+        /* Form Styling */
+        .form-control, .form-select {
+            background-color: var(--bs-body-bg);
+            border: 2px solid var(--bs-border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bs-body-bg);
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            transform: translateY(-1px);
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--bs-body-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        [data-bs-theme='dark'] .form-control,
+        [data-bs-theme='dark'] .form-select {
+            background-color: rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.1);
+            color: var(--bs-body-color);
+            direction: initial;
+        }
+
+        [data-bs-theme='dark'] .form-control:focus,
+        [data-bs-theme='dark'] .form-select:focus {
+            background-color: rgba(0,0,0,0.6);
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+        }
+
+        /* Upload Box */
+        .border.rounded-3 {
+            background: var(--bs-tertiary-bg) !important;
+            border-color: var(--bs-border-color) !important;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .border.rounded-3:hover {
+            border-color: var(--bs-primary);
+            transform: translateY(-2px);
+        }
+
+        [data-bs-theme='dark'] .border.rounded-3 {
+            background: rgba(0,0,0,0.3) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+        }
+
+        /* Alert Styling */
+        .alert {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .alert:hover {
+            transform: translateY(-2px);
+        }
+
+        [data-bs-theme='dark'] .alert {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .alert h6 {
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Modal Styling */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        [data-bs-theme='dark'] .modal-content {
+            background: rgba(30, 30, 40, 0.98);
+            box-shadow: 0 12px 56px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--bs-border-color);
+            padding: 20px 24px;
+            flex-flow: column-reverse;
+        }
+
+        [data-bs-theme='dark'] .modal-header {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-body pre {
+            background: var(--bs-tertiary-bg);
+            padding: 16px;
+            border-radius: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Vazirmatn UI', monospace !important;
+            border: 1px solid var(--bs-border-color);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        [data-bs-theme='dark'] .modal-body pre {
+            background: rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        /* Invalid Link */
+        .invalid-link {
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            color: var(--bs-primary);
+        }
+
+        .invalid-link:hover {
+            color: var(--bs-primary) !important;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        /* Button Styling */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--bs-primary) 0%, #6366f1 100%);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .bi-sun-fill::before,.bi-moon-stars-fill::before{
+            line-height: 2;
+
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(var(--bs-primary-rgb), 0.5);
+        }
+
+        [data-bs-theme='dark'] .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+
+        /* Theme Toggle Icon Animation */
+        #theme-toggle i {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #theme-toggle:hover i {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bs-tertiary-bg);
+            border-radius: 5px;
+        }
+
+        [data-bs-theme='dark'] ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bs-secondary);
+            border-radius: 5px;
+            transition: background 0.2s ease;
+        }
+
+        [data-bs-theme='dark'] ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bs-primary);
+        }
+
+        /* RTL Specific Adjustments */
+        [dir="rtl"] .btn-primary::before {
+            left: auto;
+            right: -100%;
+        }
+
+        [dir="rtl"] .btn-primary:hover::before {
+            right: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card p-5">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h3 class="mb-0 fw-bold text-primary">مدیریت آی‌پی</h3>
+            <button id="theme-toggle" title="تغییر تم">
+                <i id="theme-icon" class="bi bi-moon-stars-fill"></i>
+            </button>
+        </div>
+
+        <!-- File Selector (Segmented Control) -->
+        <form id="fileSelectionForm" method="GET" action="/">
+            <input type="hidden" name="current_file" id="selected-file-input" value="{{ selected_file }}">
+            <div class="file-nav">
+                {% for filename in allowed_files %}
+                <div class="file-nav-item {% if selected_file == filename %}active{% endif %}"
+                     onclick="changeFile('{{ filename }}')">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>{{ filename }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+
+        <!-- Main Form -->
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="target_file" value="{{ selected_file }}">
+
+            <div class="mb-5 border rounded-3" style="background: var(--bs-tertiary-bg) !important;">
+                <label class="form-label"><i class="bi bi-cloud-upload text-primary"></i>روش اول: آپلود فایل (برای آی‌پی‌های زیاد)</label>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted" style="font-size: 0.9rem;">پشتیبانی از فرمت‌های .txt</span>
+                </div>
+                <input class="form-control mt-2" type="file" name="file" accept=".txt,.log">
+            </div>
+
+            <div class="text-center my-4">
+                <span class="badge bg-secondary bg-opacity-25 text-secondary">یا</span>
+            </div>
+
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label mb-0"><i class="bi bi-pencil-square text-primary"></i>روش دوم: کپی و پیست کردن متن</label>
+                    <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size: 0.8rem;">پشتیبانی از CIDR و IP:Port</span>
+                </div>
+                <textarea class="form-control" name="ip_list" rows="3" placeholder="192.168.1.1 or 192.168.1.0/24 (8.8.8.8:53 will be auto-converted to 8.8.8.8)"></textarea>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-lg">
+                    ذخیره در {{ selected_file }} <i class="bi bi-save me-2"></i>
+                </button>
+            </div>
+        </form>
+
+        {% if report %}
+            <hr class="my-5 opacity-25">
+            {% if report.error %}
+                <div class="alert alert-danger text-center shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ report.error }}
+                </div>
+            {% else %}
+                <div class="alert alert-info border-0 shadow-sm">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-clipboard-check text-primary"></i>گزارش عملیات ({{ report.target_file }})</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2 text-success d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill"></i>
+                            جدید اضافه شد: <strong>{{ report.added }}</strong>
+                        </li>
+                        <li class="mb-2 text-warning d-flex align-items-center gap-2">
+                            <i class="bi bi-dash-circle-fill"></i>
+                            تکراری رد شد: <strong>{{ report.duplicates }}</strong>
+                        </li>
+                        {% if report.cidr_count > 0 %}
+                            <li class="mb-2 text-info d-flex align-items-center gap-2">
+                                <i class="bi bi-network text-primary"></i>
+                                رنج آی‌پی (CIDR): <strong>{{ report.cidr_count }}</strong> مورد
+                            </li>
+                        {% endif %}
+                        {% if report.invalid > 0 %}
+                            <li class="mb-2 text-danger d-flex align-items-center gap-2">
+                                <i class="bi bi-x-circle-fill"></i>
+                                نامعتبر (Skip شده): <span class="invalid-link" data-bs-toggle="modal" data-bs-target="#invalidModal">{{ report.invalid }} مورد</span>
+                            </li>
+                        {% else %}
+                            <li class="mb-2 text-danger d-flex align-items-center gap-2">
+                                <i class="bi bi-x-circle-fill"></i>
+                                نامعتبر: <strong>0</strong>
+                            </li>
+                        {% endif %}
+                        <hr class="my-3 opacity-50">
+                        <li class="mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-bar-chart-fill"></i>
+                            کل در فایل: <strong>{{ report.total }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="invalidModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0"><h5 class="modal-title fw-bold">لیست موارد نامعتبر</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body"><pre>{{ report.invalid_details | join('\n') }}</pre></div>
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="https://lib.arvancloud.ir/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Fix for File Selection Error
+    function changeFile(filename) {
+        document.getElementById('selected-file-input').value = filename;
+        document.getElementById('fileSelectionForm').submit();
+    }
+
+    // Dark Mode Logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const htmlElement = document.documentElement;
+
+    function setTheme(theme) {
+        htmlElement.setAttribute('data-bs-theme', theme);
+        localStorage.setItem('theme', theme);
+        updateIcon(theme);
+    }
+
+    function updateIcon(theme) {
+        if (theme === 'dark') {
+            themeIcon.classList.replace('bi-moon-stars-fill', 'bi-sun-fill');
+        } else {
+            themeIcon.classList.replace('bi-sun-fill', 'bi-moon-stars-fill');
+        }
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = htmlElement.getAttribute('data-bs-theme');
+        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+</script>
+</body>
+</html>
