@@ -4,6 +4,15 @@
 
 A lightweight, single-page web application built with **Python (Flask)** designed for efficient management of large IPv4 address lists. The system allows users to ingest IP addresses via manual text input or file uploads, validates them against IPv4 standards, performs deduplication against pre-defined target files, and provides detailed operational reporting.
 
+
+
+<img width="1024" height="1355" alt="Screen Shot 2026-05-08 at 13 59 21" src="https://github.com/user-attachments/assets/40fd8993-b6bb-48ea-8cb2-2dc022c34d20" />
+
+
+
+
+
+
 ## 🛠 Tech Stack
 
 -   **Backend:** Python 3.x, Flask (Micro-framework)
